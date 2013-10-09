@@ -6,11 +6,12 @@
 Created by bunnyman on 2013/10/09.
 Copyright (c) 2013 Bunni.biz. All rights reserved.
 """
+from datetime import datetime
 import os
 import shutil
 import unittest
-from datetime import datetime
 import mm
+from mm.utils import cleanup_files
 
 
 class TestMM(unittest.TestCase):
@@ -32,10 +33,10 @@ class TestMM(unittest.TestCase):
         self.assertTrue(os.path.exists("in"))
         with open("out", 'w') as outfile:
             outfile.write("testing stufffffff")
-        mm.cleanup(self.test_name, True, True)
+        cleanup_files(self.test_name, True, True)
         self.assertTrue(os.path.isfile(datetime.now().strftime("%Y-%m-%dT%H%M%S")))
         self.assertTrue(os.path.isfile("out"))
-        mm.cleanup(self.test_name, False, False)
+        cleanup_files(self.test_name, False, False)
         self.assertFalse(os.path.exists("in"))
         self.assertFalse(os.path.isfile("out"))
 

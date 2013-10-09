@@ -9,13 +9,11 @@ Copyright (c) 2013 Bunni.biz. All rights reserved.
 
 from __future__ import print_function
 import atexit
-import shutil
 import sys
 import os
 import errno
-from datetime import datetime
-import twisted
 import argparse
+from mm.utils import cleanup_files
 
 
 class MuMe(object):
@@ -53,6 +51,7 @@ class MuMe(object):
 
         sys.exit(0)
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description="A FIFO and filesystem based MU* client")
     parser.add_argument("name", help="connection name")
@@ -65,23 +64,9 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def cleanup(name, log=True, preserve=False):
-    if os.path.basename(os.getcwd()) == name:
-        try:
-            if os.path.exists("in"):
-                os.unlink("in")
-            if os.path.isfile("out"):
-                if log:
-                    shutil.copyfile("out", datetime.now().strftime("%Y-%m-%dT%H%M%S"))
-                if not preserve:
-                    os.unlink("out")
-        except OSError as e:
-            print("unlinking {} caused error {}".format(e.filename, e.message))
-
-
 def main():
     args = parse_arguments()
-    atexit.register(cleanup, args.name, args.log, args.preserve)
+    atexit.register(cleanup_files, args.name, args.log, args.preserve)
     mm = MuMe(args.name, args.server, args.port, args.ssl, args.debug)
     mm.run()
 
