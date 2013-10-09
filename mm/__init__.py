@@ -53,7 +53,6 @@ class MuMe(object):
 
         sys.exit(0)
 
-
 def parse_arguments():
     parser = argparse.ArgumentParser(description="A FIFO and filesystem based MU* client")
     parser.add_argument("name", help="connection name")
