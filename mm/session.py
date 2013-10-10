@@ -1,7 +1,5 @@
 from __future__ import print_function
-import sys
-from twisted.internet.endpoints import TCP4ClientEndpoint, SSL4ClientEndpoint
-from twisted.internet.protocol import ReconnectingClientFactory, ClientFactory
+from twisted.internet.protocol import ClientFactory
 from twisted.conch.telnet import TelnetTransport, StatefulTelnetProtocol
 
 
@@ -10,8 +8,8 @@ class ConnectionError(Exception):
 
 
 class MuckSession(StatefulTelnetProtocol):
-    def __init__(self):
-        self.outfile = sys.stdout
+    def __init__(self, outfile):
+        self.outfile = outfile
 
     def connectionMade(self):
         print("~Connected!", file=self.outfile)
@@ -23,7 +21,6 @@ class MuckSession(StatefulTelnetProtocol):
         return self.sendLine(line)
 
     def close(self):
-        self.write("QUIT")
         self.factory.transport.loseConnection()
         return True
 
@@ -31,13 +28,21 @@ class MuckSession(StatefulTelnetProtocol):
 class MuckFactory(ClientFactory):
     def __init__(self, outfile):
         self.outfile = outfile
+        self.transport = None
+
+    def buildProtocol(self, addr):
+        self.transport = TelnetTransport(MuckSession, self.outfile)
+        self.transport.factory = self
+        return self.transport
 
     def startedConnecting(self, connector):
         print("~Connecting", file=self.outfile)
 
     def clientConnectionFailed(self, connector, reason):
         print("!Connection Failed: {}".format(reason), file=self.outfile)
+        ClientFactory.clientConnectionFailed(self, connector, reason)
 
     def clientConnectionLost(self, connector, reason):
         print("!Disconnected: {}".format(reason), file=self.outfile)
+        ClientFactory.clientConnectionLost(self, connector, reason)
 

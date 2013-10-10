@@ -48,13 +48,14 @@ class TestMM(unittest.TestCase):
         outfile = sys.stdout
         from twisted.internet import reactor
         endpoint = TCP4ClientEndpoint(reactor, self.test_server, self.test_port)
-        muck_factory = mm.MuckFactory(outfile)
-        muck_factory.protocol = mm.MuckSession
-        d = endpoint.connect(muck_factory)
+        d = endpoint.connect(mm.MuckFactory(outfile))
 
         def test_protocol(p):
-            reactor.callLater(3, p.write, "WHO")
-            reactor.callLater(5, p.close)
+            tn = p.protocol
+            reactor.callLater(2, tn.write, "WHO")
+            reactor.callLater(2.5, tn.write, "QUIT")
+            reactor.callLater(3, tn.close)
+            reactor.callLater(3.5, reactor.stop)
 
         d.addCallback(test_protocol)
         reactor.run()
