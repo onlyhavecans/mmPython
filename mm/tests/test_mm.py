@@ -11,6 +11,7 @@ import os
 import shutil
 import unittest
 import mm
+import mm.session
 from mm.utils import cleanup_files
 
 
@@ -39,6 +40,9 @@ class TestMM(unittest.TestCase):
         cleanup_files(self.test_name, False, False)
         self.assertFalse(os.path.exists("in"))
         self.assertFalse(os.path.isfile("out"))
+
+    def test_session(self):
+        sess = mm.session.MuckSession("dongs")
 
 
 if __name__ == '__main__':
