@@ -12,33 +12,30 @@ import atexit
 import sys
 import os
 import errno
-from datetime import datetime
-import twisted
 import argparse
+from twisted.internet import reactor
+from twisted.internet.endpoints import TCP4ClientEndpoint, SSL4ClientEndpoint
+from mm.session import MuckSession, MuckFactory
+from mm.utils import cleanup_files
 
 
 class MuMe(object):
-    def __init__(self, args):
-        self.name = args.name
-        self.server = args.server
-        self.port = args.port
-        self.ssl = args.ssl
-        self.debug = args.debug
+    def __init__(self, name, server, port, ssl=False, debug=False):
+        self.name = name
+        self.server = server
+        self.port = port
+        self.ssl = ssl
+        self.debug = debug
 
-    def run(self):
+    def enter_directory(self):
         try:
             os.makedirs(self.name)
         except OSError as e:
             if e.errno == errno.EEXIST:
                 pass
-
         os.chdir(self.name)
-        self._make_in()
-        print("Daemonize this shit yourself")
 
-        sys.exit(0)
-
-    def _make_in(self):
+    def make_in(self):
         try:
             os.mkfifo("in")
         except OSError:
@@ -46,9 +43,23 @@ class MuMe(object):
             print("if you run multiple copies in the same directory you're gonna have a bad time")
             if raw_input("Type YES to unlink and recreate: ") == "YES":
                 os.unlink("in")
-                self._make_in()
+                self.make_in()
             else:
                 sys.exitfunc()
+
+    def run(self):
+        self.enter_directory()
+        self.make_in()
+
+        point = None
+        if self.ssl:
+            point = SSL4ClientEndpoint(reactor, self.server, self.port)
+        else:
+            point = TCP4ClientEndpoint(reactor, self.server, self.port)
+        MuckSession()
+        print("Daemonize this shit yourself")
+
+        sys.exit(0)
 
 
 def parse_arguments():
@@ -63,22 +74,10 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def cleanup(name, preserve, log):
-    if os.path.basename(os.curdir) == name:
-        try:
-            if os.path.exists("in"):
-                os.unlink("in")
-            if not preserve:
-                if os.path.exists("out"):
-                    os.unlink("out")
-        except OSError as e:
-            print("unlinking {} caused error {}".format(e.filename, e.message))
-
-
 def main():
     args = parse_arguments()
-    atexit.register(cleanup, args.name, args.preserve, args.log)
-    mm = MuMe(args)
+    atexit.register(cleanup_files, args.name, args.log, args.preserve)
+    mm = MuMe(args.name, args.server, args.port, args.ssl, args.debug)
     mm.run()
 
 
