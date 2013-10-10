@@ -16,6 +16,7 @@ class MuckSession(StatefulTelnetProtocol):
 
     def lineReceived(self, line):
         print(line, file=self.outfile)
+        self.outfile.flush()
 
     def write(self, line):
         return self.sendLine(line)
@@ -40,9 +41,11 @@ class MuckFactory(ClientFactory):
 
     def clientConnectionFailed(self, connector, reason):
         print("!Connection Failed: {}".format(reason), file=self.outfile)
+        self.outfile.flush()
         ClientFactory.clientConnectionFailed(self, connector, reason)
 
     def clientConnectionLost(self, connector, reason):
         print("!Disconnected: {}".format(reason), file=self.outfile)
+        self.outfile.flush()
         ClientFactory.clientConnectionLost(self, connector, reason)
 

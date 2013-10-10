@@ -50,15 +50,20 @@ class MuMe(object):
     def run(self):
         self.enter_directory()
         self.make_in()
+        outfile = open('out', 'w')
 
-        point = None
+        from twisted.internet import reactor, ssl
+        endpoint = None
         if self.ssl:
-            point = SSL4ClientEndpoint(reactor, self.server, self.port)
+            endpoint = SSL4ClientEndpoint(reactor, self.server, self.port, ssl.ClientContextFactory())
         else:
-            point = TCP4ClientEndpoint(reactor, self.server, self.port)
-        MuckSession()
-        print("Daemonize this shit yourself")
+            endpoint = TCP4ClientEndpoint(reactor, self.server, self.port)
+        d = endpoint.connect(MuckFactory(outfile))
 
+        print("Daemonize this shit yourself")
+        reactor.run()
+
+        outfile.close()
         sys.exit(0)
 
 

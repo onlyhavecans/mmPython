@@ -11,7 +11,8 @@ import os
 import shutil
 import unittest
 import sys
-from twisted.internet.endpoints import TCP4ClientEndpoint
+
+from twisted.internet.endpoints import TCP4ClientEndpoint, SSL4ClientEndpoint
 import mm
 
 
@@ -44,10 +45,26 @@ class TestMM(unittest.TestCase):
         self.assertFalse(os.path.exists("in"))
         self.assertFalse(os.path.isfile("out"))
 
-    def test__standard_session(self):
+    def test_standard_session(self):
         outfile = sys.stdout
         from twisted.internet import reactor
         endpoint = TCP4ClientEndpoint(reactor, self.test_server, self.test_port)
+        d = endpoint.connect(mm.MuckFactory(outfile))
+
+        def test_protocol(p):
+            tn = p.protocol
+            reactor.callLater(2, tn.write, "WHO")
+            reactor.callLater(2.5, tn.write, "QUIT")
+            reactor.callLater(3, tn.close)
+            reactor.callLater(3.5, reactor.stop)
+
+        d.addCallback(test_protocol)
+        reactor.run()
+
+    def test_ssl_session(self):
+        outfile = sys.stdout
+        from twisted.internet import reactor, ssl
+        endpoint = SSL4ClientEndpoint(reactor, self.test_server, 6699, ssl.ClientContextFactory())
         d = endpoint.connect(mm.MuckFactory(outfile))
 
         def test_protocol(p):
