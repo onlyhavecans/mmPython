@@ -13,7 +13,6 @@ import sys
 import os
 import errno
 import argparse
-from twisted.internet import reactor
 from twisted.internet.endpoints import TCP4ClientEndpoint, SSL4ClientEndpoint
 from mm.session import MuckSession, MuckFactory
 from mm.utils import cleanup_files
@@ -47,23 +46,30 @@ class MuMe(object):
             else:
                 sys.exitfunc()
 
+    def read_in(self, infile):
+        pass
+
     def run(self):
         self.enter_directory()
         self.make_in()
-        outfile = open('out', 'w')
+        with open('out', 'w') as outfile:
+            from twisted.internet import reactor, ssl
+            endpoint = None
+            if self.ssl:
+                endpoint = SSL4ClientEndpoint(reactor, self.server, self.port, ssl.ClientContextFactory())
+            else:
+                endpoint = TCP4ClientEndpoint(reactor, self.server, self.port)
+            d = endpoint.connect(MuckFactory(outfile))
 
-        from twisted.internet import reactor, ssl
-        endpoint = None
-        if self.ssl:
-            endpoint = SSL4ClientEndpoint(reactor, self.server, self.port, ssl.ClientContextFactory())
-        else:
-            endpoint = TCP4ClientEndpoint(reactor, self.server, self.port)
-        d = endpoint.connect(MuckFactory(outfile))
+            def test_protocol(p):
+                tn = p.protocol
+                reactor.callLater(2, tn.write, "WHO")
+                reactor.callLater(3, tn.write, "QUIT")
+                reactor.callLater(4, tn.close)
+                reactor.callLater(5, reactor.stop)
 
-        print("Daemonize this shit yourself")
-        reactor.run()
-
-        outfile.close()
+            d.addCallback(test_protocol)
+            reactor.run()
         sys.exit(0)
 
 
