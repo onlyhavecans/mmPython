@@ -14,6 +14,7 @@ import os
 import errno
 import argparse
 from twisted.internet.endpoints import TCP4ClientEndpoint, SSL4ClientEndpoint
+from twisted.python import log
 from mm.session import MuckSession, MuckFactory
 from mm.utils import cleanup_files
 
@@ -52,24 +53,25 @@ class MuMe(object):
     def run(self):
         self.enter_directory()
         self.make_in()
-        with open('out', 'w') as outfile:
-            from twisted.internet import reactor, ssl
-            endpoint = None
-            if self.ssl:
-                endpoint = SSL4ClientEndpoint(reactor, self.server, self.port, ssl.ClientContextFactory())
-            else:
-                endpoint = TCP4ClientEndpoint(reactor, self.server, self.port)
-            d = endpoint.connect(MuckFactory(outfile))
+        log.startLogging(sys.stdout)
+        from twisted.internet import reactor, ssl
+        endpoint = None
+        if self.ssl:
+            endpoint = SSL4ClientEndpoint(reactor, self.server, self.port, ssl.ClientContextFactory())
+        else:
+            endpoint = TCP4ClientEndpoint(reactor, self.server, self.port)
+        d = endpoint.connect(MuckFactory("out"))
 
-            def test_protocol(p):
-                tn = p.protocol
-                reactor.callLater(2, tn.write, "WHO")
-                reactor.callLater(3, tn.write, "QUIT")
-                reactor.callLater(4, tn.close)
-                reactor.callLater(5, reactor.stop)
+        def test_protocol(p):
+            tn = p.protocol
+            reactor.callLater(2, tn.write, "WHO")
+            reactor.callLater(3, tn.write, "QUIT")
+            reactor.callLater(4, tn.close)
+            reactor.callLater(5, reactor.stop)
 
-            d.addCallback(test_protocol)
-            reactor.run()
+        d.addCallback(test_protocol)
+
+        reactor.run()
         sys.exit(0)
 
 

@@ -12,8 +12,16 @@ def cleanup_files(name, log=True, preserve=False):
                 os.unlink("in")
             if os.path.isfile("out"):
                 if log:
-                    shutil.copyfile("out", datetime.now().strftime("%Y-%m-%dT%H%M%S"))
+                    shutil.copyfile("out", get_timestamp())
                 if not preserve:
                     os.unlink("out")
         except OSError as e:
             print("unlinking {} caused error {}".format(e.filename, e.message))
+
+
+def get_timestamp():
+    """
+    Single place to edit all the timestamsp
+    """
+    return datetime.now().strftime("%Y-%m-%dT%H%M%S")
+
