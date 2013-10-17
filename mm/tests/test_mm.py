@@ -46,7 +46,7 @@ class TestMM(unittest.TestCase):
         self.assertFalse(os.path.isfile("out"))
 
     def test_standard_session(self):
-        outfile = sys.stdout
+        outfile = "test_out"
         from twisted.internet import reactor
         endpoint = TCP4ClientEndpoint(reactor, self.test_server, self.test_port)
         d = endpoint.connect(mm.MuckFactory(outfile))
@@ -60,6 +60,9 @@ class TestMM(unittest.TestCase):
 
         d.addCallback(test_protocol)
         reactor.run()
+        self.assertTrue(os.path.exists(outfile))
+        self.assertTrue(os.path.getsize(outfile) > 500)
+        os.unlink(outfile)
 
 
 if __name__ == '__main__':
