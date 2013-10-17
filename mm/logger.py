@@ -1,27 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-$FILE
-
-Created by bunnyman on 2013/10/14.
-Copyright (c) 2013 Bunni.biz. All rights reserved.
-"""
-
-import sys
-import os
-
-
-def main():
-	pass
-
-
-if __name__ == '__main__':
-	main()
-
-
-
-__author__ = 'bunnyman'
-
 
 class SessionLogger(object):
     """

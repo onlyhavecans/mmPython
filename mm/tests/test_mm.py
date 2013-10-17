@@ -61,22 +61,6 @@ class TestMM(unittest.TestCase):
         d.addCallback(test_protocol)
         reactor.run()
 
-    def test_ssl_session(self):
-        outfile = sys.stdout
-        from twisted.internet import reactor, ssl
-        endpoint = SSL4ClientEndpoint(reactor, self.test_server, 6699, ssl.ClientContextFactory())
-        d = endpoint.connect(mm.MuckFactory(outfile))
-
-        def test_protocol(p):
-            tn = p.protocol
-            reactor.callLater(2, tn.write, "WHO")
-            reactor.callLater(2.5, tn.write, "QUIT")
-            reactor.callLater(3, tn.close)
-            reactor.callLater(3.5, reactor.stop)
-
-        d.addCallback(test_protocol)
-        reactor.run()
-
 
 if __name__ == '__main__':
     unittest.main()
