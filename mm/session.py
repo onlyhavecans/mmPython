@@ -33,6 +33,8 @@ class MuckSession(StatefulTelnetProtocol):
 
 
 class HackFIFO(FIFOReader):
+    chunk_size = 3
+
     def doRead(self):
         """
         Don't die till I tell you to
@@ -45,6 +47,8 @@ class HackFIFO(FIFOReader):
                     return
                 else:
                     return main.CONNECTION_LOST
+            if not output:
+                return
             self.protocol.dataReceived(output)
 
 
