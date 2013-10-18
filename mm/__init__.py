@@ -15,6 +15,7 @@ import errno
 import argparse
 from twisted.internet.endpoints import TCP4ClientEndpoint, SSL4ClientEndpoint
 from twisted.python import log
+from mm import fifo
 from mm.session import MuckSession, MuckFactory
 from mm.utils import cleanup_files
 
@@ -60,17 +61,7 @@ class MuMe(object):
             endpoint = SSL4ClientEndpoint(reactor, self.server, self.port, ssl.ClientContextFactory())
         else:
             endpoint = TCP4ClientEndpoint(reactor, self.server, self.port)
-        d = endpoint.connect(MuckFactory("out"))
-
-        def test_protocol(p):
-            tn = p.protocol
-            reactor.callLater(2, tn.write, "WHO")
-            reactor.callLater(3, tn.write, "QUIT")
-            reactor.callLater(4, tn.close)
-            reactor.callLater(5, reactor.stop)
-
-        d.addCallback(test_protocol)
-
+        deferred = endpoint.connect(MuckFactory("out", "in"))
         reactor.run()
         sys.exit(0)
 
