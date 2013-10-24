@@ -5,16 +5,15 @@ import shutil
 import sys
 
 
-def cleanup_files(name, log=True, preserve=False):
+def cleanup_files(name, nolog=False):
     if os.path.basename(os.getcwd()) == name:
         try:
             if os.path.exists("in"):
                 os.unlink("in")
             if os.path.isfile("out"):
-                if log:
+                if not nolog:
                     shutil.copyfile("out", get_timestamp())
-                if not preserve:
-                    os.unlink("out")
+                os.unlink("out")
         except OSError as e:
             print("unlinking {} caused error {}".format(e.filename, e.message))
 

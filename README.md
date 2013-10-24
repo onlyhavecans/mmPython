@@ -13,8 +13,12 @@ In this directory it creates an `out` file which has the output, and a FIFO `in`
 
 write to in, get muck from out.
 
+when you disconnect the program quits and rotates out to a timestamped log. You can disable this with --nolog
+
 ## Advanced usage tips
 - Use screen or tmux to split your screen and then multitail to read out with all the coloring you need.
-- In vim you can use key mappings like `map w1 :.w >> in<cr>`
+- In vim you can use key mappings like `map <leader>m :.w >> in<cr>o` to shortcut write current line & open new line
+- If you don't like history for some reason use `map <leader>m :w >> in<cr>ggdGi` to write all lines, wipe, & insert
+- Also in vim use c-p and c-n to autocomplete names and words from your history
 - simple shell or perl scripts can be used to read from out and automate tasks
 - A simple shell script wrapper could set up your env and auto log you in
