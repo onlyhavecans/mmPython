@@ -54,7 +54,8 @@ class MuMe(object):
     def run(self):
         self.enter_directory()
         self.make_in()
-        log.startLogging(sys.stdout)
+        if self.debug:
+            log.startLogging(sys.stdout)
         from twisted.internet import reactor, ssl
         endpoint = None
         if self.ssl:
