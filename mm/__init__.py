@@ -7,7 +7,6 @@ Created by bunnyman on 2013/10/08.
 Copyright (c) 2013 Bunni.biz. All rights reserved.
 """
 
-from __future__ import print_function
 import atexit
 import argparse
 from mm import fifo
