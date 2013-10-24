@@ -14,6 +14,7 @@ import sys
 
 from twisted.internet.endpoints import TCP4ClientEndpoint, SSL4ClientEndpoint
 import mm
+from mm.mume import MuMe
 
 
 class TestMM(unittest.TestCase):
@@ -31,7 +32,7 @@ class TestMM(unittest.TestCase):
             pass
 
     def test_setupdestroy_files(self):
-        tester = mm.MuMe(self.test_name, self.test_server, self.test_port)
+        tester = MuMe(self.test_name, self.test_server, self.test_port)
         tester.enter_directory()
         self.assertEqual(os.path.basename(os.getcwd()), self.test_name)
         tester.make_in()
