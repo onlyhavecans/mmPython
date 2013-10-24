@@ -11,7 +11,7 @@ import sys
 import os
 from twisted.internet.endpoints import SSL4ClientEndpoint, TCP4ClientEndpoint
 from twisted.python import log
-from mm import MuckFactory
+from mm.session import MuckFactory
 
 
 class MuMe(object):

@@ -10,9 +10,7 @@ from datetime import datetime
 import os
 import shutil
 import unittest
-import sys
-
-from twisted.internet.endpoints import TCP4ClientEndpoint, SSL4ClientEndpoint
+from twisted.internet.endpoints import TCP4ClientEndpoint
 import mm
 from mm.mume import MuMe
 
@@ -39,10 +37,10 @@ class TestMM(unittest.TestCase):
         self.assertTrue(os.path.exists("in"))
         with open("out", 'w') as outfile:
             outfile.write("testing stufffffff")
-        mm.cleanup_files(self.test_name, True, True)
+        mm.utils.cleanup_files(self.test_name, True, True)
         self.assertTrue(os.path.isfile(datetime.now().strftime("%Y-%m-%dT%H%M%S")))
         self.assertTrue(os.path.isfile("out"))
-        mm.cleanup_files(self.test_name, False, False)
+        mm.utils.cleanup_files(self.test_name, False, False)
         self.assertFalse(os.path.exists("in"))
         self.assertFalse(os.path.isfile("out"))
 

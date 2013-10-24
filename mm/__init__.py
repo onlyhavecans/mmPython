@@ -9,10 +9,9 @@ Copyright (c) 2013 Bunni.biz. All rights reserved.
 
 import atexit
 import argparse
-from mm import fifo
+from mm import utils
 from mm.mume import MuMe
 from mm.session import MuckSession, MuckFactory
-import mm.utils
 
 
 def parse_arguments():
