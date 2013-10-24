@@ -20,7 +20,7 @@ def cleanup_files(name, nolog=False):
 
 def get_timestamp():
     """
-    Single place to edit all the timestamsp
+    Single place to edit all the timestamps
     """
     return datetime.now().strftime("%Y-%m-%dT%H%M%S")
 
