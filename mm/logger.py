@@ -1,4 +1,3 @@
-
 class SessionLogger(object):
     """
     Making this a class will allow us to extend this with "plugins" later

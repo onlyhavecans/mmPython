@@ -1,8 +1,8 @@
 from datetime import datetime
+import errno
 import os
 import shutil
-
-__author__ = 'bitm'
+import sys
 
 
 def cleanup_files(name, log=True, preserve=False):
@@ -25,3 +25,15 @@ def get_timestamp():
     """
     return datetime.now().strftime("%Y-%m-%dT%H%M%S")
 
+
+def move_to_main_directory():
+    muckdir = os.path.join(os.path.expanduser('~'), 'muck')
+    try:
+        os.makedirs(muckdir)
+    except OSError as e:
+        if e.errno == errno.EEXIST:
+            pass
+        else:
+            print("Cannot make ~/muck. Failing")
+            sys.exit(9)
+    os.chdir(muckdir)

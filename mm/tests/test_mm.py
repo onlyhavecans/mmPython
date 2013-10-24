@@ -68,4 +68,3 @@ class TestMM(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 
-__author__ = 'bunnyman'

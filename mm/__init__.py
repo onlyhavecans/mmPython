@@ -17,7 +17,7 @@ from twisted.internet.endpoints import TCP4ClientEndpoint, SSL4ClientEndpoint
 from twisted.python import log
 from mm import fifo
 from mm.session import MuckSession, MuckFactory
-from mm.utils import cleanup_files
+import mm.utils
 
 
 class MuMe(object):
@@ -34,6 +34,9 @@ class MuMe(object):
         except OSError as e:
             if e.errno == errno.EEXIST:
                 pass
+            else:
+                print("Cannot make connection directory {}".format(self.name))
+                sys.exit(9)
         os.chdir(self.name)
 
     def make_in(self):
@@ -81,7 +84,8 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
-    atexit.register(cleanup_files, args.name, args.log, args.preserve)
+    atexit.register(utils.cleanup_files, args.name, args.log, args.preserve)
+    utils.move_to_main_directory()
     mm = MuMe(args.name, args.server, args.port, args.ssl, args.debug)
     mm.run()
 
@@ -89,4 +93,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-__author__ = 'bunnyman'
