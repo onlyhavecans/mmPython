@@ -22,3 +22,4 @@ when you disconnect the program quits and rotates out to a timestamped log. You 
 - Also in vim use c-p and c-n to autocomplete names and words from your history
 - simple shell or perl scripts can be used to read from out and automate tasks
 - A simple shell script wrapper could set up your env and auto log you in
+- in fact, most all tips and tricks for ii will work for mm including now to handle multiple sessions with one screen, ect
