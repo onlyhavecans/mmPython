@@ -1,10 +1,9 @@
 from __future__ import print_function
 import os
 from twisted.internet.protocol import ClientFactory, Protocol
-from twisted.protocols.basic import LineReceiver
 import errno
 from twisted.conch.telnet import TelnetTransport, StatefulTelnetProtocol
-from twisted.internet import main
+from twisted.internet import main, reactor
 from mm.fifo import FIFOReader
 from mm.logger import SessionLogger
 from mm.utils import get_timestamp
@@ -19,17 +18,16 @@ class MuckSession(StatefulTelnetProtocol):
         self.logger = SessionLogger(open(self.transport.factory.filename, 'a'))
         self.logger.log("~Connected at {}".format(get_timestamp()))
 
+    def connectionLost(self, reason):
+        self.logger.log("~Connection lost at {}".format(get_timestamp()))
+        self.logger.close()
+        StatefulTelnetProtocol.connectionLost(self, reason)
+
     def lineReceived(self, line):
         self.logger.log(line)
 
     def write(self, line):
         return self.sendLine(line)
-
-    def close(self):
-        self.logger.log("~Connection lost at {}".format(get_timestamp()))
-        self.factory.transport.loseConnection()
-        self.logger.close()
-        return True
 
 
 class HackFIFO(FIFOReader):
@@ -54,7 +52,6 @@ class HackFIFO(FIFOReader):
 
 class FIFOProtocol(Protocol):
     def __init__(self, factory):
-        self.delimiter = "\n"
         self.factory = factory
 
     def dataReceived(self, data):
@@ -75,11 +72,7 @@ class MuckFactory(ClientFactory):
         self.fifo.startReading()
         return self.transport
 
-    def clientConnectionFailed(self, connector, reason):
-        print("!Connection Failed: {}".format(reason))
-        ClientFactory.clientConnectionFailed(self, connector, reason)
-
-    def clientConnectionLost(self, connector, reason):
-        print("!Disconnected: {}".format(reason))
-        ClientFactory.clientConnectionLost(self, connector, reason)
+    def stopFactory(self):
+        self.fifo.loseConnection()
+        reactor.stop()
 
