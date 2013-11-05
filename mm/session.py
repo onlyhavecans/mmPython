@@ -9,7 +9,7 @@ from mm.logger import SessionLogger
 from mm.utils import get_timestamp
 
 
-BREKING THIS CODE    def __init__(self):
+DEBREKING THIS CODE    def __init__(self):
         self.setLineMode()
         self.logger = None
 
