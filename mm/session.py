@@ -9,8 +9,7 @@ from mm.logger import SessionLogger
 from mm.utils import get_timestamp
 
 
-class MuckSession(StatefulTelnetProtocol):
-    def __init__(self):
+BREKING THIS CODE    def __init__(self):
         self.setLineMode()
         self.logger = None
 
